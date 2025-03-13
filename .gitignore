@@ -28,3 +28,7 @@ env/
 
 # Logs
 *.log
+
+# Experiments journals and logs
+experiments/journals
+experiments/logs

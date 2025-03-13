@@ -15,4 +15,13 @@ htmlcov/
 .tox/
 .idea/
 .vscode/
-*.dat
+*.log
+*.swp
+*.swo
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+*.zip
+*.tar.gz

@@ -1,0 +1,80 @@
+{
+    "version": "1.0.0",
+    "title": "Does the service tolerate the loss of its example file?",
+    "description": "This experiment tests if the service can handle the loss of its example file by moving it and observing the service's response.",
+    "tags": [
+        "filesystem"
+    ],
+    "configuration": {
+        "service_url": {
+            "type": "env",
+            "key": "SERVICE_URL",
+            "default": "http://localhost:8080/"
+        }
+    },
+    "steady-state-hypothesis": {
+        "title": "The example.dat file must exist",
+        "probes": [
+            {
+                "type": "probe",
+                "name": "service-is-available",
+                "tolerance": [200, 404],
+                "provider": {
+                    "type": "http",
+                    "url": "${service_url}",
+                    "timeout": 3
+                }
+            }
+        ]
+    },
+    "method": [
+        {
+            "name": "move-example-file",
+            "type": "action",
+            "provider": {
+                "type": "python",
+                "module": "os",
+                "func": "rename",
+                "arguments": {
+                    "src": "./example.dat",
+                    "dst": "./example.dat.old"
+                }
+            }
+        },
+        {
+            "type": "probe",
+            "name": "check-service-response-during-chaos",
+            "tolerance": {
+                "type": "regex",
+                "pattern": ".*",
+                "target": "status"
+            },
+            "provider": {
+                "type": "http",
+                "url": "${service_url}",
+                "method": "GET",
+                "timeout": 3
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "name": "restore-example-file",
+            "type": "action",
+            "provider": {
+                "type": "python",
+                "module": "os", 
+                "func": "rename",
+                "arguments": {
+                    "src": "./example.dat.old",
+                    "dst": "./example.dat"
+                }
+            }
+        }
+    ],
+    "contributions": {
+        "availability": "high",
+        "reliability": "high",
+        "safety": "none"
+    }
+}
